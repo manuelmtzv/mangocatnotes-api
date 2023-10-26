@@ -1,5 +1,5 @@
-import mongoose, { Schema, SchemaDefinition } from 'mongoose'
 import { INote } from '@/interfaces/INote'
+import { Schema, SchemaDefinition, model } from 'mongoose'
 
 const noteSchema: SchemaDefinition<INote> = {
   title: {
@@ -14,9 +14,11 @@ const noteSchema: SchemaDefinition<INote> = {
   lastUpdated: { type: Date, default: Date.now() },
 }
 
-const Note = mongoose.model(
-  'note',
-  new Schema(noteSchema, { versionKey: false })
-)
+const options = {
+  timestamps: true,
+  versionKey: false,
+}
+
+const Note = model('note', new Schema(noteSchema, options))
 
 export default Note

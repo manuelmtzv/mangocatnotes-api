@@ -8,9 +8,9 @@ import setRoutes from '@/router'
 // Setting all routes files
 setRoutes(app)
 
-const port = process.env ? Number(process.env.PORT) : 3000
+const port = process.env.PORT ? Number(process.env.PORT) : 3000
 
 app.listen(port, () => {
   startConnection()
-  console.log('Listening in: http://localhost:3000')
+  console.log(`Listening in: http://localhost:${port}`)
 })

@@ -8,7 +8,7 @@ export default function setRoutes(app: Express, dirname = 'routes') {
     const routeModule = (await import(`${__dirname}/${dirname}/${file}`)) as {
       default: Router
     }
-    const routeBase = `/${file.split('.')[0]}`
+    const routeBase = `/api/${file.split('.')[0]}`
     app.use(routeBase, routeModule.default)
   })
 }
