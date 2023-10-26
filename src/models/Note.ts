@@ -10,6 +10,11 @@ const noteSchema: SchemaDefinition<INote> = {
     type: String,
     required: true,
   },
+  userId: {
+    type: String,
+    ref: 'user',
+    required: true,
+  },
   archived: { type: Boolean, default: false },
   lastUpdated: { type: Date, default: Date.now() },
 }

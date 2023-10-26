@@ -1,9 +1,5 @@
-import { Request as ExpressRequest, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-
-export interface Request extends ExpressRequest {
-  userId?: string
-}
 
 const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   const [token] = req.header('Authorization')?.split(' ').reverse() || []
@@ -18,11 +14,10 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     const { _id } = jwt.verify(token, process.env.JWT_SECRET as string) as {
       _id: string
     }
-    req.userId = _id
+    req.userId = { _id }
+    next()
   } catch (error: any) {
     res.status(401).send({ message: 'Invalid authentication token!' })
-  } finally {
-    next()
   }
 }
 
