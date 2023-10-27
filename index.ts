@@ -3,7 +3,7 @@ import 'dotenv/config'
 
 import app from '@/app'
 import { startConnection } from '@/database'
-import setRoutes from '@/router'
+import setRoutes from '@/setRoutes'
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000
 
