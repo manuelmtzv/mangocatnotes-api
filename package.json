@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.ts"
+    "dev": "tsx watch index.ts",
+    "start": "tsc ./dist/index.js",
+    "build": "tsc && tsc-alias"
   },
   "keywords": [],
   "author": "",
@@ -31,5 +33,10 @@
   },
   "_moduleAliases": {
     "@": "./src"
+  },
+  "devDependencies": {
+    "tsc-alias": "^1.8.8",
+    "tsc-watch": "^6.0.4",
+    "tsx": "^3.14.0"
   }
 }

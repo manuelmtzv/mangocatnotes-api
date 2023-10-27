@@ -1,14 +1,7 @@
-import fs from 'fs'
-import { Express, Router } from 'express'
+import * as routes from './routes'
+import { Express } from 'express'
 
-const routesDirectory = './src/routes'
-
-export default function setRoutes(app: Express, dirname = 'routes') {
-  fs.readdirSync(routesDirectory).forEach(async (file) => {
-    const routeModule = (await import(`${__dirname}/${dirname}/${file}`)) as {
-      default: Router
-    }
-    const routeBase = `/api/${file.split('.')[0]}`
-    app.use(routeBase, routeModule.default)
-  })
+export default function setRoutes(app: Express) {
+  app.use('/api/auth', routes.authRouter)
+  app.use('/api/notes', routes.noteRouter)
 }

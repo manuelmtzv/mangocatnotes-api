@@ -5,10 +5,9 @@ import app from '@/app'
 import { startConnection } from '@/database'
 import setRoutes from '@/router'
 
-// Setting all routes files
-setRoutes(app)
-
 const port = process.env.PORT ? Number(process.env.PORT) : 3000
+
+setRoutes(app)
 
 app.listen(port, () => {
   startConnection()

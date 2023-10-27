@@ -2,8 +2,15 @@ import { Router } from 'express'
 import requireAuth from '@/middlewares/requireAuth'
 import noteController from '@/controllers/noteController'
 
-const noteRouter = Router().use(requireAuth)
+export const noteRouter = Router().use(requireAuth)
 
-noteRouter.route('/').get(noteController.getAllNotes)
+noteRouter
+  .route('/')
+  .get(noteController.getAllNotes)
+  .post(noteController.createNote)
 
-export default noteRouter
+noteRouter
+  .route('/:id')
+  .get(noteController.getNoteById)
+  .put(noteController.updateNote)
+  .delete(noteController.deleteNote)

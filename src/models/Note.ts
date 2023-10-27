@@ -16,7 +16,6 @@ const noteSchema: SchemaDefinition<INote> = {
     required: true,
   },
   archived: { type: Boolean, default: false },
-  lastUpdated: { type: Date, default: Date.now() },
 }
 
 const options = {
