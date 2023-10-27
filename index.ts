@@ -9,7 +9,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000
 
 setRoutes(app)
 
-app.listen(port, () => {
-  startConnection()
+app.listen(port, async () => {
+  await startConnection()
   console.log(`Listening in: http://localhost:${port}`)
 })
