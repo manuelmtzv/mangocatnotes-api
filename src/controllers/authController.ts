@@ -20,6 +20,7 @@ const authController = {
       res.status(400).send({ message: error.message })
     }
   },
+
   async login(req: Request, res: Response) {
     const { identifier, password } = req.body
 
@@ -31,6 +32,28 @@ const authController = {
       res.status(200).send({ username: user.username, token })
     } catch (error: any) {
       res.status(400).send({ message: error.message })
+    }
+  },
+
+  async validateToken(req: Request, res: Response) {
+    const token = req.headers.authorization?.split(' ')[1]
+
+    if (!token) {
+      return res.status(401).send({ message: 'Token not found' })
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        _id: string
+      }
+      const user = await User.findById(decoded._id)
+
+      if (!user) {
+        return res.status(401).send({ message: 'User not found' })
+      }
+      res.status(200).send({ username: user.username, token })
+    } catch (error: any) {
+      res.status(401).send({ message: error.message })
     }
   },
 }
