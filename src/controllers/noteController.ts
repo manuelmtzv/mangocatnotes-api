@@ -21,10 +21,10 @@ const noteController = {
     const { title, content } = req.body
 
     try {
-      if (!title || !content) throw new Error('Title and content are required!')
+      if (!content) throw new Error('Content is required!')
 
       const newNote = new Note({
-        title,
+        title: title ?? "",
         content,
         userId: req.userId,
       })
