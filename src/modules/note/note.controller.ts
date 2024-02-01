@@ -1,12 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { NoteService } from './note.service';
+import { CreateNoteDto } from './dto';
 
 @Controller('notes')
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
-  @Get()
-  getNotes() {
-    return this.noteService.getNotes();
+  @Post()
+  getNotes(@Body() dto: CreateNoteDto) {
+    return dto;
   }
 }

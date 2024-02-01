@@ -8,4 +8,8 @@ export class NoteService {
   async getNotes() {
     return this.prisma.note.findMany();
   }
+
+  async createNote() {
+    // return this.prisma.note.create({ data: dto });
+  }
 }
