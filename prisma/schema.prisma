@@ -18,6 +18,7 @@ model User {
 
   name String?
 
+  @@unique([email, username])
   @@map("users")
 }
 

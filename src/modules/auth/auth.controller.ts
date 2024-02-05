@@ -11,6 +11,9 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtGuard } from './guard';
+import { GetUser } from './decorator';
+import { User } from '@prisma/client';
+import { GetJwt } from './decorator/getJwt.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -19,8 +22,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtGuard)
   @Get('validate-token')
-  validateToken() {
-    return;
+  validateToken(@GetUser() user: User, @GetJwt() token: string) {
+    return this.authService.validateToken(user, token);
   }
 
   @Post('register')
@@ -29,7 +32,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post()
+  @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
