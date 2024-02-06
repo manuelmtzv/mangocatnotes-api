@@ -13,7 +13,11 @@ async function bootstrap() {
       },
     }),
   );
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   const config = app.get(ConfigService);
   await app.listen(config.get('PORT') || 3000);
