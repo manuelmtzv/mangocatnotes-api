@@ -10,7 +10,10 @@ export class NoteService {
   async getNotes(userId: string) {
     const notes = await this.prisma.note.findMany({ where: { userId } });
 
-    return notes;
+    return {
+      data: notes,
+      count: notes.length,
+    };
   }
 
   async getNote(noteId: string) {

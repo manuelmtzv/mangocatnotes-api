@@ -33,7 +33,7 @@ export class AuthService {
       });
 
       delete user.hash;
-      return this.signToken(user.id, user.email);
+      return this.signToken(user.id, user.email, user.username);
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
@@ -58,13 +58,14 @@ export class AuthService {
     if (!passwordValid)
       throw new ForbiddenException('Invalid identifier or password');
 
-    return this.signToken(user.id, user.email);
+    return this.signToken(user.id, user.email, user.username);
   }
 
   async signToken(
     userId: string | number,
     email: string,
-  ): Promise<{ access_token: string }> {
+    username: string,
+  ): Promise<{ accessToken: string; username: string }> {
     const payload = {
       sub: userId,
       email,
@@ -76,7 +77,8 @@ export class AuthService {
     });
 
     return {
-      access_token: token,
+      accessToken: token,
+      username,
     };
   }
 }
