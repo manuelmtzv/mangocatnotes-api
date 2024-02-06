@@ -18,7 +18,7 @@ export class AuthService {
   ) {}
 
   async validateToken(user: User, token: string) {
-    return { username: user.username, token };
+    return { username: user.username, accessToken: token };
   }
 
   async register(dto: RegisterDto) {
