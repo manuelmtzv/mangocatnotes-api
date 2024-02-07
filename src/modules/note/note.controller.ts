@@ -28,8 +28,11 @@ export class NoteController {
   }
 
   @Get(':id')
-  getNote(@Param('id', IsObjectIdPipe) noteId: string) {
-    return this.noteService.getNote(noteId);
+  getNote(
+    @GetUser('id') userId: string,
+    @Param('id', IsObjectIdPipe) noteId: string,
+  ) {
+    return this.noteService.getNote(userId, noteId);
   }
 
   @Post()

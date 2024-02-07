@@ -7,6 +7,28 @@ import { UpdateNoteDto } from './dto/updateNote.dto';
 export class NoteService {
   constructor(private prisma: PrismaService) {}
 
+  async attachTag(userId: string, noteId: string, tagId: string) {
+    return this.prisma.note.update({
+      where: { id: noteId, userId },
+      data: {
+        tags: {
+          connect: { id: tagId },
+        },
+      },
+    });
+  }
+
+  async detachTag(userId: string, noteId: string, tagId: string) {
+    return this.prisma.note.update({
+      where: { id: noteId, userId },
+      data: {
+        tags: {
+          disconnect: { id: tagId },
+        },
+      },
+    });
+  }
+
   async getNotes(userId: string) {
     const notes = await this.prisma.note.findMany({ where: { userId } });
 
@@ -16,12 +38,13 @@ export class NoteService {
     };
   }
 
-  async getNote(noteId: string) {
-    const note = await this.prisma.note.findUnique({ where: { id: noteId } });
+  async getNote(userId: string, noteId: string) {
+    const note = await this.prisma.note.findUnique({
+      where: { id: noteId, userId },
+    });
 
     if (!note)
-      throw new NotFoundException(`Note with provided id was not found`);
-
+      throw new NotFoundException('Note with provided id was not found');
     return note;
   }
 
