@@ -16,9 +16,10 @@ import { UpdateTagDto } from './dto/UpdateTag';
 import { GetUser } from '@modules/auth/decorator';
 import { JwtGuard } from '@modules/auth/guard';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Tags')
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtGuard)
 @Controller('tags')
 export class TagController {

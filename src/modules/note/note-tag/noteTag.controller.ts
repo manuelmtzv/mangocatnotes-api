@@ -11,9 +11,10 @@ import { NoteTagService } from './noteTag.service';
 import { NoteService } from '../note.service';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { GetUser } from '@src/modules/auth/decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Notes')
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtGuard)
 @Controller('notes')
 export class NoteTagController {

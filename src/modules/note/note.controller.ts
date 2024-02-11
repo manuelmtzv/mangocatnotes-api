@@ -17,9 +17,10 @@ import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { GetUser } from '@modules/auth/decorator';
 import { JwtGuard } from '@modules/auth/guard';
 import { UpdateNoteDto } from './dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Notes')
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtGuard)
 @Controller('notes')
 export class NoteController {

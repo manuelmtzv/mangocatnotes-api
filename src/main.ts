@@ -28,6 +28,17 @@ async function bootstrap() {
     .setTitle('Mangocatnotes API')
     .setDescription('The Mangocatnotes API endpoint documentation.')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        description: 'JWT Authorization',
+        type: 'http',
+        in: 'header',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'JWT-auth',
+    )
+    .addSecurityRequirements('bearer')
     .build();
 
   const swaggerOptions: SwaggerDocumentOptions = {
