@@ -14,7 +14,9 @@ import { JwtGuard } from './guard';
 import { GetUser } from './decorator';
 import { User } from '@prisma/client';
 import { GetJwt } from './decorator/getJwt.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
