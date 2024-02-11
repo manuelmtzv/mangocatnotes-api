@@ -1,36 +1,58 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@modules/prisma/prisma.service';
-import { CreateNoteDto } from './dto';
+import { CreateNoteDto, FilterNotesDto } from './dto';
 import { UpdateNoteDto } from './dto/updateNote.dto';
 
 @Injectable()
 export class NoteService {
   constructor(private prisma: PrismaService) {}
 
-  async attachTag(userId: string, noteId: string, tagId: string) {
-    return this.prisma.note.update({
-      where: { id: noteId, userId },
-      data: {
-        tags: {
-          connect: { id: tagId },
-        },
-      },
-    });
-  }
-
-  async detachTag(userId: string, noteId: string, tagId: string) {
-    return this.prisma.note.update({
-      where: { id: noteId, userId },
-      data: {
-        tags: {
-          disconnect: { id: tagId },
-        },
-      },
-    });
-  }
-
   async getNotes(userId: string) {
-    const notes = await this.prisma.note.findMany({ where: { userId } });
+    const notes = await this.prisma.note.findMany({
+      where: { userId },
+      include: { tags: true },
+    });
+
+    return {
+      data: notes,
+      count: notes.length,
+    };
+  }
+
+  async getFilteredNotes(userId: string, dto: FilterNotesDto) {
+    const { limit, search, tags } = dto;
+
+    const notes = await this.prisma.note.findMany({
+      where: {
+        userId,
+        OR: [
+          {
+            tags: {
+              some: {
+                name: {
+                  in: tags,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      include: { tags: true },
+      take: Number(limit) || undefined,
+    });
 
     return {
       data: notes,
