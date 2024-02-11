@@ -28,8 +28,6 @@ export class NoteController {
 
   @Get()
   getNotes(@GetUser('id') userId: string, @Query() filtersDto: FilterNotesDto) {
-    console.log(filtersDto);
-
     if (Object.keys(filtersDto).length)
       return this.noteService.getFilteredNotes(userId, filtersDto);
 
