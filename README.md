@@ -33,3 +33,6 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## API Documentation
+[Swagger Docs](mangocatnotes-api.up.railway.app/api)
