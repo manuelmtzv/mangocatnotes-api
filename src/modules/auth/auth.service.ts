@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
@@ -6,7 +10,6 @@ import { omit } from 'rambda';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { PrismaService } from '@modules/prisma/prisma.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -22,6 +25,12 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
+    if (await this.prisma.user.findFirst({ where: { email: dto.email } }))
+      throw new BadRequestException('Email already exists');
+
+    if (await this.prisma.user.findFirst({ where: { username: dto.username } }))
+      throw new BadRequestException('Username already exists');
+
     const hash = await argon.hash(dto.password);
 
     try {
@@ -35,11 +44,6 @@ export class AuthService {
       delete user.hash;
       return this.signToken(user.id, user.email, user.username);
     } catch (err) {
-      if (err instanceof PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') {
-          throw new Error('Email already exists');
-        }
-      }
       throw err;
     }
   }
