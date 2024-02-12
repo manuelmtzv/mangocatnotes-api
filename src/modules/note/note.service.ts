@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@modules/prisma/prisma.service';
-import { CreateNoteDto } from './dto';
+import { CreateNoteDto, FilterNotesDto } from './dto';
 import { UpdateNoteDto } from './dto/updateNote.dto';
 
 @Injectable()
@@ -8,7 +8,10 @@ export class NoteService {
   constructor(private prisma: PrismaService) {}
 
   async getNotes(userId: string) {
-    const notes = await this.prisma.note.findMany({ where: { userId } });
+    const notes = await this.prisma.note.findMany({
+      where: { userId },
+      include: { tags: true },
+    });
 
     return {
       data: notes,
@@ -16,12 +19,54 @@ export class NoteService {
     };
   }
 
-  async getNote(noteId: string) {
-    const note = await this.prisma.note.findUnique({ where: { id: noteId } });
+  async getFilteredNotes(userId: string, dto: FilterNotesDto) {
+    const { limit, search, tags } = dto;
+
+    const notes = await this.prisma.note.findMany({
+      where: {
+        userId,
+        OR: [
+          {
+            tags: {
+              some: {
+                name: {
+                  in: tags,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+          {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+          {
+            content: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      include: { tags: true },
+      take: Number(limit) || undefined,
+    });
+
+    return {
+      data: notes,
+      count: notes.length,
+    };
+  }
+
+  async getNote(userId: string, noteId: string) {
+    const note = await this.prisma.note.findUnique({
+      where: { id: noteId, userId },
+    });
 
     if (!note)
-      throw new NotFoundException(`Note with provided id was not found`);
-
+      throw new NotFoundException('Note with provided id was not found');
     return note;
   }
 

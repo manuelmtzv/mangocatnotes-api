@@ -8,28 +8,38 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { NoteService } from './note.service';
-import { CreateNoteDto } from './dto';
+import { CreateNoteDto, FilterNotesDto } from './dto';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
-import { GetUser } from '../auth/decorator';
-import { JwtGuard } from '../auth/guard';
-import { UpdateNoteDto } from './dto/updateNote.dto';
+import { GetUser } from '@modules/auth/decorator';
+import { JwtGuard } from '@modules/auth/guard';
+import { UpdateNoteDto } from './dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Notes')
+@ApiBearerAuth('JWT-auth')
 @UseGuards(JwtGuard)
 @Controller('notes')
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
   @Get()
-  getNotes(@GetUser('id') userId: string) {
+  getNotes(@GetUser('id') userId: string, @Query() filtersDto: FilterNotesDto) {
+    if (Object.keys(filtersDto).length)
+      return this.noteService.getFilteredNotes(userId, filtersDto);
+
     return this.noteService.getNotes(userId);
   }
 
   @Get(':id')
-  getNote(@Param('id', IsObjectIdPipe) noteId: string) {
-    return this.noteService.getNote(noteId);
+  getNote(
+    @GetUser('id') userId: string,
+    @Param('id', IsObjectIdPipe) noteId: string,
+  ) {
+    return this.noteService.getNote(userId, noteId);
   }
 
   @Post()
