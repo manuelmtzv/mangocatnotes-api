@@ -1,6 +1,6 @@
 ## Description
 
-[Mangocatnotes](https://github.com/nestjs/nest) API repository.
+[Mangocatnotes](https://github.com/manuelmtzv/mangocatnotes-web) API repository.
 
 ## Installation
 
