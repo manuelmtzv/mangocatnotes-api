@@ -35,4 +35,4 @@ $ npm run test:cov
 ```
 
 ## API Documentation
-[Swagger Docs](mangocatnotes-api.up.railway.app/api)
+[Swagger Docs](https://mangocatnotes-api.up.railway.app/api)
