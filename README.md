@@ -54,4 +54,4 @@ $ npm run test:cov
 ## Documentación del API
 
 - Web: [Swagger Docs](https://mangocatnotes-api.up.railway.app/api)
-- Local: https://localhost:{your-port}/api
+- Local: https://localhost:3000/api (o en el puerto seleccionado).
