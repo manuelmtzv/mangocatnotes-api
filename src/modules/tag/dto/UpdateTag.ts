@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsHexColor, IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateTagDto {
@@ -6,4 +6,9 @@ export class UpdateTagDto {
   @IsOptional()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional({ example: '#000' })
+  @IsOptional()
+  @IsHexColor()
+  color: string;
 }
