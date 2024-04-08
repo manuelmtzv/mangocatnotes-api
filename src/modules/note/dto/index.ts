@@ -1,3 +1,3 @@
 export * from './createNote.dto';
-export * from './filterNotes.dto';
+export * from './paginate-notes.dto';
 export * from './updateNote.dto';

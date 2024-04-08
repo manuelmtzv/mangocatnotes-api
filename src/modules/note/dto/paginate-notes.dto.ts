@@ -1,21 +1,23 @@
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class FilterNotesDto {
+export class PaginateNotesDto {
   @ApiPropertyOptional({ example: 10 })
   @IsOptional()
   @IsNumber()
+  @Min(1)
   @Transform(({ value }) => parseInt(value))
   page?: number;
 
-  @ApiPropertyOptional({ example: '1' })
+  @ApiPropertyOptional({ example: 5 })
   @IsOptional()
   @IsNumber()
+  @Min(0)
   @Transform(({ value }) => parseInt(value))
   limit?: number;
 
-  @ApiPropertyOptional({ example: 'Lorem ipsum' })
+  @ApiPropertyOptional({ example: 'Things to do' })
   @IsOptional()
   @IsString()
   search?: string;

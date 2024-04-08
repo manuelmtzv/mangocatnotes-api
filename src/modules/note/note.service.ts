@@ -1,103 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@modules/prisma/prisma.service';
-import { CreateNoteDto, FilterNotesDto } from './dto';
+import { CreateNoteDto, PaginateNotesDto } from './dto';
 import { UpdateNoteDto } from './dto/updateNote.dto';
+import { paginate } from '@src/shared/utils/paginate';
 
 @Injectable()
 export class NoteService {
   constructor(private prisma: PrismaService) {}
 
-  async getNotes(userId: string, dto: FilterNotesDto) {
+  async getNotes(userId: string, dto: PaginateNotesDto) {
+    const { page = 1, limit = 10, search, tags } = dto;
+
     const noteCount = (
       await this.prisma.note.findMany({
         where: { userId },
       })
     ).length;
-    const maxPages = Math.ceil(noteCount / 10);
-    const { page = 1 } = dto;
 
-    const filterCount = Object.keys(dto).length;
-
-    if ((filterCount === 1 && !('page' in dto)) || filterCount > 1) {
-      return this.getFilteredNotes(userId, dto, noteCount);
-    }
-
-    if (page > maxPages) {
-      return {
-        data: [],
-        count: 0,
-      };
-    }
-
-    const notes = await this.prisma.note.findMany({
-      where: { userId },
-      include: { tags: true },
-      take: 10,
-      skip: (page - 1) * 10,
-    });
-
-    return {
-      data: notes,
-      count: notes.length,
-      currentPage: page,
-      maxPages,
-    };
-  }
-
-  async getFilteredNotes(
-    userId: string,
-    dto: FilterNotesDto,
-    noteCount: number,
-  ) {
-    const { limit = 10, page = 1, search, tags } = dto;
-    const maxPages = Math.ceil(noteCount / limit);
-    const filtersPresent = search || tags;
-
-    if (page > maxPages) {
-      return {
-        data: [],
-        count: 0,
-      };
-    }
+    const pagination = paginate({ count: noteCount, page, limit });
 
     const notes = await this.prisma.note.findMany({
       where: {
         userId,
-        OR: filtersPresent && [
-          {
-            tags: {
-              some: {
-                name: {
-                  in: tags,
-                  mode: 'insensitive',
-                },
-              },
-            },
+        title: search && { contains: search },
+        tags: tags && {
+          some: {
+            name: { in: tags },
           },
-          {
-            title: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            content: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ],
+        },
       },
-      include: { tags: true },
-      take: limit,
-      skip: (page - 1) * limit,
+      ...pagination.config(),
     });
 
     return {
       data: notes,
-      count: notes.length,
-      currentPage: page,
-      maxPages,
+      meta: {
+        page,
+        limit,
+        count: notes.length,
+        totalPages: pagination.maxPage,
+      },
     };
   }
 
