@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTagDto } from './dto/CreateTagDto';
 import { UpdateTagDto } from './dto/UpdateTag';
@@ -26,6 +30,19 @@ export class TagService {
   }
 
   async createTag(userId: string, dto: CreateTagDto) {
+    const userTags = await this.prisma.tag.findMany({ where: { userId } });
+
+    // TODO: Think about a better way to handle this, considering the frontend and business logic. For now, I'm going to restrict it to 10 tags.
+    if (userTags.length >= 10) {
+      throw new BadRequestException('You can only have 10 tags');
+    }
+
+    for (const tag of userTags) {
+      if (tag.name === dto.name) {
+        throw new BadRequestException('Tag with provided name already exists');
+      }
+    }
+
     const tag = this.prisma.tag.create({
       data: {
         ...dto,
