@@ -29,6 +29,7 @@ export class NoteService {
           },
         },
       },
+      orderBy: { updatedAt: 'desc' },
       ...pagination.config(),
     });
 
