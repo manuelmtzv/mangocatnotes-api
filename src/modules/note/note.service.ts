@@ -1,62 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@modules/prisma/prisma.service';
-import { CreateNoteDto, FilterNotesDto } from './dto';
+import { CreateNoteDto, PaginateNotesDto } from './dto';
 import { UpdateNoteDto } from './dto/updateNote.dto';
+import { paginate } from '@src/shared/utils/paginate';
 
 @Injectable()
 export class NoteService {
   constructor(private prisma: PrismaService) {}
 
-  async getNotes(userId: string) {
-    const notes = await this.prisma.note.findMany({
-      where: { userId },
-      include: { tags: true },
-    });
+  async getNotes(userId: string, dto: PaginateNotesDto) {
+    const { page = 1, limit = 10, search, tags } = dto;
 
-    return {
-      data: notes,
-      count: notes.length,
-    };
-  }
+    const noteCount = (
+      await this.prisma.note.findMany({
+        where: { userId },
+      })
+    ).length;
 
-  async getFilteredNotes(userId: string, dto: FilterNotesDto) {
-    const { limit, search, tags } = dto;
+    const pagination = paginate({ count: noteCount, page, limit });
 
     const notes = await this.prisma.note.findMany({
       where: {
         userId,
-        OR: [
-          {
-            tags: {
-              some: {
-                name: {
-                  in: tags,
-                  mode: 'insensitive',
-                },
-              },
-            },
+        title: search && { contains: search },
+        tags: tags && {
+          some: {
+            name: { in: tags },
           },
-          {
-            title: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            content: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ],
+        },
       },
-      include: { tags: true },
-      take: Number(limit) || undefined,
+      ...pagination.config(),
     });
 
     return {
       data: notes,
-      count: notes.length,
+      meta: {
+        page,
+        limit,
+        count: notes.length,
+        totalPages: pagination.maxPage,
+      },
     };
   }
 

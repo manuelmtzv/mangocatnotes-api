@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { NoteService } from './note.service';
-import { CreateNoteDto, FilterNotesDto } from './dto';
+import { CreateNoteDto, PaginateNotesDto } from './dto';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { GetUser } from '@modules/auth/decorator';
 import { JwtGuard } from '@modules/auth/guard';
@@ -27,11 +27,11 @@ export class NoteController {
   constructor(private readonly noteService: NoteService) {}
 
   @Get()
-  getNotes(@GetUser('id') userId: string, @Query() filtersDto: FilterNotesDto) {
-    if (Object.keys(filtersDto).length)
-      return this.noteService.getFilteredNotes(userId, filtersDto);
-
-    return this.noteService.getNotes(userId);
+  getNotes(
+    @GetUser('id') userId: string,
+    @Query() paginateDto: PaginateNotesDto,
+  ) {
+    return this.noteService.getNotes(userId, paginateDto);
   }
 
   @Get(':id')
