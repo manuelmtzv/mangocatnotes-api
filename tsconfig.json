@@ -14,6 +14,7 @@
       "@src/*": ["src/*"],
       "@modules/*": ["src/modules/*"]
     },
+    "types": ["@types/jest"],
     "moduleResolution": "node",
     "incremental": true,
     "skipLibCheck": true,
