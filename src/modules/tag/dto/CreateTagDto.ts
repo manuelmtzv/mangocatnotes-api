@@ -16,7 +16,7 @@ export class CreateTagDto {
   @MaxLength(20)
   name: string;
 
-  @ApiPropertyOptional({ example: '#000' })
+  @ApiPropertyOptional({ example: '#fff' })
   @IsOptional()
   @IsHexColor()
   color: string;

@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTagDto } from './dto/CreateTagDto';
 import { UpdateTagDto } from './dto/UpdateTag';
+import { uniq } from 'rambda';
 
 @Injectable()
 export class TagService {
@@ -29,11 +30,46 @@ export class TagService {
     return tag;
   }
 
+  async findTagsOrCreate(userId: string, tags: string[]) {
+    tags = uniq(tags);
+
+    const previouslyCreatedTags = await this.prisma.tag.findMany({
+      where: { userId, name: { in: tags } },
+    });
+
+    const toCreateTags = tags.filter(
+      (tag) => !previouslyCreatedTags.find((t) => t.name === tag),
+    );
+
+    if (toCreateTags.length === 0) {
+      return {
+        data: previouslyCreatedTags,
+        count: previouslyCreatedTags.length,
+      };
+    }
+
+    if (previouslyCreatedTags.length + toCreateTags.length > 50) {
+      throw new BadRequestException('You can only have a maximum of 50 tags');
+    }
+
+    await this.prisma.tag.createMany({
+      data: toCreateTags.map((tag) => ({ name: tag, userId })),
+    });
+
+    const allTags = await this.prisma.tag.findMany({
+      where: { userId, name: { in: tags } },
+    });
+
+    return {
+      data: allTags,
+      count: allTags.length,
+    };
+  }
+
   async createTag(userId: string, dto: CreateTagDto) {
     const userTags = await this.prisma.tag.findMany({ where: { userId } });
 
-    // TODO: Think about a better way to handle this, considering the frontend and business logic. For now, I'm going to restrict it to 10 tags.
-    if (userTags.length >= 10) {
+    if (userTags.length >= 50) {
       throw new BadRequestException('You can only have 10 tags');
     }
 
