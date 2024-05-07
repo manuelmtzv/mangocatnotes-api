@@ -12,7 +12,7 @@ export class CreateTagDto {
   @ApiProperty({ example: 'Tag name' })
   @IsNotEmpty()
   @IsString()
-  @MinLength(3)
+  @MinLength(2)
   @MaxLength(20)
   name: string;
 

@@ -36,7 +36,13 @@ export class NoteService {
       },
       orderBy: { updatedAt: 'desc' },
       include: {
-        tags: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
       },
       ...pagination.config(),
     });
@@ -76,8 +82,9 @@ export class NoteService {
         ...rest,
         userId,
         tags: {
-          connect:
-            createdTags.length && createdTags.map((tag) => ({ id: tag.id })),
+          connect: createdTags.length
+            ? createdTags.map((tag) => ({ id: tag.id }))
+            : undefined,
         },
       },
     });

@@ -70,7 +70,7 @@ export class TagService {
     const userTags = await this.prisma.tag.findMany({ where: { userId } });
 
     if (userTags.length >= 50) {
-      throw new BadRequestException('You can only have 10 tags');
+      throw new BadRequestException('You can only have 50 tags');
     }
 
     for (const tag of userTags) {
