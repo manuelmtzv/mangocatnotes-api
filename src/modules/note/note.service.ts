@@ -87,6 +87,15 @@ export class NoteService {
             : undefined,
         },
       },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
     });
 
     return note;
