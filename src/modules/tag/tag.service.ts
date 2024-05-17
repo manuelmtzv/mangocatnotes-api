@@ -13,7 +13,10 @@ export class TagService {
   constructor(private prisma: PrismaService) {}
 
   async getTags(userId: string) {
-    const tags = await this.prisma.tag.findMany({ where: { userId } });
+    const tags = await this.prisma.tag.findMany({
+      where: { userId },
+      orderBy: { updatedAt: 'desc' },
+    });
 
     return {
       data: tags,
@@ -49,7 +52,7 @@ export class TagService {
     }
 
     if (previouslyCreatedTags.length + toCreateTags.length > 50) {
-      throw new BadRequestException('You can only have a maximum of 50 tags');
+      throw new BadRequestException('You can only have a maximum of 50 tags.');
     }
 
     await this.prisma.tag.createMany({
@@ -70,12 +73,14 @@ export class TagService {
     const userTags = await this.prisma.tag.findMany({ where: { userId } });
 
     if (userTags.length >= 50) {
-      throw new BadRequestException('You can only have 50 tags');
+      throw new BadRequestException('You can only have 50 tags.');
     }
 
     for (const tag of userTags) {
       if (tag.name === dto.name) {
-        throw new BadRequestException('Tag with provided name already exists');
+        throw new BadRequestException(
+          `Tag with provided name (${dto.name}) already exists.`,
+        );
       }
     }
 
@@ -94,7 +99,8 @@ export class TagService {
       where: { id: tagId, userId },
     });
 
-    if (!tag) throw new NotFoundException('Tag with provided id was not found');
+    if (!tag)
+      throw new NotFoundException('Tag with provided id was not found.');
 
     const updatedTag = this.prisma.tag.update({
       where: { id: tagId, userId },
@@ -109,7 +115,8 @@ export class TagService {
       where: { id: tagId, userId },
     });
 
-    if (!tag) throw new NotFoundException('Tag with provided id was not found');
+    if (!tag)
+      throw new NotFoundException('Tag with provided id was not found.');
 
     await this.prisma.tag.delete({ where: { id: tagId } });
   }
