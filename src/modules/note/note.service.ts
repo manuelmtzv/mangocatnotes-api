@@ -3,10 +3,15 @@ import { PrismaService } from '@modules/prisma/prisma.service';
 import { CreateNoteDto, PaginateNotesDto } from './dto';
 import { UpdateNoteDto } from './dto/updateNote.dto';
 import { paginate } from '@src/shared/utils/paginate';
+import { TagService } from '../tag/tag.service';
+import { Tag } from '@prisma/client';
 
 @Injectable()
 export class NoteService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly tagService: TagService,
+  ) {}
 
   async getNotes(userId: string, dto: PaginateNotesDto) {
     const { page = 1, limit = 10, search, tags } = dto;
@@ -30,6 +35,15 @@ export class NoteService {
         },
       },
       orderBy: { updatedAt: 'desc' },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
       ...pagination.config(),
     });
 
@@ -55,10 +69,32 @@ export class NoteService {
   }
 
   async createNote(userId: string, dto: CreateNoteDto) {
+    let createdTags: Tag[] = [];
+    const { tags, ...rest } = dto;
+
+    if (tags) {
+      const { data } = await this.tagService.findTagsOrCreate(userId, tags);
+      createdTags = data;
+    }
+
     const note = this.prisma.note.create({
       data: {
-        ...dto,
+        ...rest,
         userId,
+        tags: {
+          connect: createdTags.length
+            ? createdTags.map((tag) => ({ id: tag.id }))
+            : undefined,
+        },
+      },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
       },
     });
 

@@ -17,6 +17,7 @@ import { GetUser } from '@modules/auth/decorator';
 import { JwtGuard } from '@modules/auth/guard';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateManyTagsDto } from './dto/CreateManyTags.dto';
 
 @ApiTags('Tags')
 @ApiBearerAuth('JWT-auth')
@@ -41,6 +42,14 @@ export class TagController {
   @Post()
   createTag(@GetUser('id') userId: string, @Body() dto: CreateTagDto) {
     return this.tagService.createTag(userId, dto);
+  }
+
+  @Post('find-or-create')
+  findTagsOrCreate(
+    @GetUser('id') userId: string,
+    @Body() createManyTagsDto: CreateManyTagsDto,
+  ) {
+    return this.tagService.findTagsOrCreate(userId, createManyTagsDto.tags);
   }
 
   @Patch(':id')
