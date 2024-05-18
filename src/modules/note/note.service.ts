@@ -61,6 +61,15 @@ export class NoteService {
   async getNote(userId: string, noteId: string) {
     const note = await this.prisma.note.findUnique({
       where: { id: noteId, userId },
+      include: {
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
+          },
+        },
+      },
     });
 
     if (!note)

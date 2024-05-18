@@ -3,8 +3,9 @@ import {
   Controller,
   Param,
   Get,
-  Post,
   Delete,
+  Patch,
+  Body,
 } from '@nestjs/common';
 import { JwtGuard } from '@src/modules/auth/guard';
 import { NoteTagService } from './noteTag.service';
@@ -12,6 +13,7 @@ import { NoteService } from '../note.service';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { GetUser } from '@src/modules/auth/decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AttachNoteTagsDto } from '../dto/attach-note-tags.dto';
 
 @ApiTags('Notes')
 @ApiBearerAuth('JWT-auth')
@@ -31,7 +33,16 @@ export class NoteTagController {
     return this.noteTagService.getNoteTags(userId, noteId);
   }
 
-  @Post(':noteId/tags/:tagId')
+  @Patch(':noteId/tags')
+  attachTags(
+    @GetUser('id') userId: string,
+    @Param('noteId', IsObjectIdPipe) noteId: string,
+    @Body() dto: AttachNoteTagsDto,
+  ) {
+    return this.noteTagService.attachTags(userId, noteId, dto.tags);
+  }
+
+  @Patch(':noteId/tags/:tagId')
   attachTag(
     @GetUser('id') userId: string,
     @Param('noteId', IsObjectIdPipe) noteId: string,
