@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import * as argon from 'argon2';
 import { omit } from 'rambda';
@@ -9,6 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 import { PrismaService } from '@modules/prisma/prisma.service';
 import { User } from '@prisma/client';
 import { UserService } from '../user/user.service';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -56,6 +58,12 @@ export class AuthService {
 
   async login(user: User) {
     return { username: user.username, email: user.email };
+  }
+
+  async logout(req: Request) {
+    req.session.destroy((err) => {
+      if (err) throw new InternalServerErrorException('Failed to logout');
+    });
   }
 
   async validateToken(user: User) {

@@ -28,7 +28,6 @@ export class AuthController {
     private readonly sessionService: SessionService,
   ) {}
 
-  @HttpCode(HttpStatus.OK)
   @UseGuards(SessionAuthGuard)
   @Get('validate-token')
   validateToken(@GetUser() user: User) {
@@ -40,7 +39,6 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -51,5 +49,11 @@ export class AuthController {
     await this.sessionService.attachDeviceMetadata(req, deviceMetadata);
 
     return await this.authService.login(user);
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('logout')
+  async logout(@Req() req: Request) {
+    await this.authService.logout(req);
   }
 }
