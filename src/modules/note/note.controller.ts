@@ -15,13 +15,13 @@ import { NoteService } from './note.service';
 import { CreateNoteDto, PaginateNotesDto } from './dto';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
 import { GetUser } from '@modules/auth/decorator';
-import { JwtGuard } from '@modules/auth/guard';
+// import { JwtGuard } from '@modules/auth/guard';
 import { UpdateNoteDto } from './dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { SessionAuthGuard } from '@modules/auth/guard/session.guard';
 
 @ApiTags('Notes')
-@ApiBearerAuth('JWT-auth')
-@UseGuards(JwtGuard)
+@UseGuards(SessionAuthGuard)
 @Controller('notes')
 export class NoteController {
   constructor(private readonly noteService: NoteService) {}

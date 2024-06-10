@@ -2,55 +2,32 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  SwaggerModule,
-  DocumentBuilder,
-  SwaggerDocumentOptions,
-} from '@nestjs/swagger';
+
+import { swaggerConfig, sessionConfig, redisConfig } from '@/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const config = app.get(ConfigService);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
     }),
   );
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: ['http://localhost:5173'],
     credentials: true,
   });
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Mangocatnotes API')
-    .setDescription('The Mangocatnotes API endpoint documentation.')
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        description: 'JWT Authorization',
-        type: 'http',
-        in: 'header',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-      },
-      'JWT-auth',
-    )
-    .addSecurityRequirements('bearer')
-    .build();
+  // Swagger Config
+  swaggerConfig(app);
 
-  const swaggerOptions: SwaggerDocumentOptions = {
-    operationIdFactory: (_: string, methodKey: string) => methodKey,
-  };
+  // Redis Config
+  const { redisStore } = await redisConfig(config);
 
-  const swaggerDocument = SwaggerModule.createDocument(
-    app,
-    swaggerConfig,
-    swaggerOptions,
-  );
+  // Session Config
+  sessionConfig(app, config, redisStore);
 
-  SwaggerModule.setup('api', app, swaggerDocument);
-
-  const config = app.get(ConfigService);
   await app.listen(config.get('PORT') || 3000);
 }
 bootstrap();

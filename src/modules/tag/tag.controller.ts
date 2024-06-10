@@ -14,14 +14,13 @@ import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/CreateTagDto';
 import { UpdateTagDto } from './dto/UpdateTag';
 import { GetUser } from '@modules/auth/decorator';
-import { JwtGuard } from '@modules/auth/guard';
 import { IsObjectIdPipe } from '@src/pipes/mongoId/isObjectId.pipe';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateManyTagsDto } from './dto/CreateManyTags.dto';
+import { SessionAuthGuard } from '../auth/guard/session.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Tags')
-@ApiBearerAuth('JWT-auth')
-@UseGuards(JwtGuard)
+@UseGuards(SessionAuthGuard)
 @Controller('tags')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
